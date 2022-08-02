@@ -19,3 +19,11 @@ To see the versions at the end of its respective day:
     * You can open this branch in VS Code using `code .`
 ## To update your version with a newer version on github
 * `git pull --all`
+
+
+## Your ENV file should contian the following environment variables:
+* FLASK_APP
+* FLASK_ENV
+* SECRET_KEY
+* SQLALCHEMY_DATABASE_URI
+* SQLALCHEMY_TRACK_MODIFICATIONS

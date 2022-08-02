@@ -1,7 +1,9 @@
-from flask import render_template, request
+from flask import redirect, render_template, request, url_for
 import requests
 from app import app
 from .forms import LoginForm, RegisterForm
+from .models import User
+from flask_login import login_user, login_required
 
 # Routes
 @app.route('/', methods=['GET'])
@@ -12,16 +14,39 @@ def index():
 def api_test():
     return {"Dylan S":"Smelly", "Dylan K":"Smart", "Sarah":"Worlds Best Mom", "Gio":"handfull"}
 
+
 @app.route('/students', methods=['GET'])
+@login_required
 def students():
     my_students = ['Alex', 'Jody', 'Francisco', 'Jacoby', 'Andre']
-    
                                                 #var_name in Jinja = var name in python
     return render_template('students.html.j2', students=my_students)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        try:
+            new_user_data={
+                "first_name":form.first_name.data.title(),
+                "last_name":form.last_name.data.title(),
+                "email":form.email.data.lower(),
+                "password":form.password.data
+            }
+            # Create an Empty user
+            new_user_object = User()
+
+            #build our user from the form data
+            new_user_object.from_dict(new_user_data)
+
+            # Save new user to the database
+            new_user_object.save()
+        except:
+            # Flash user Error
+            return render_template('register.html.j2', form=form)
+        # Flash user here telling you have been register
+        return redirect(url_for('login'))
+    
     return render_template('register.html.j2', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -30,10 +55,14 @@ def login():
     if request.method == 'POST' and form.validate_on_submit():
         email = form.email.data.lower()
         password = form.password.data
-        if email in app.config.get("REGISTERED_USERS") and \
-            password == app.config.get("REGISTERED_USERS").get(email).get('password'):
+
+        u = User.query.filter_by(email=email).first()
+        if u and u.check_hashed_password(password):
             #Login Success!!!!!
-            return f"Login Success Welcome {app.config.get('REGISTERED_USERS').get(email).get('name')}"
+            # Flash user
+            login_user(u)
+            return redirect(url_for('index'))
+        #flash this
         error_string = "Incorrect Email/password Combo"
         return render_template('login.html.j2', error=error_string, form=form)
 
