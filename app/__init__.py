@@ -20,8 +20,6 @@ login = LoginManager(app)
 # Configure some Settings
 login.login_view = 'login'
 login.login_message = 'Log yourself in you filthy animal'
-
-
-
+login.login_message_category = 'warning'
 
 from app import routes, models
