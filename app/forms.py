@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app import app
+from .models import User
 # Forms
 class LoginForm(FlaskForm):
     email = StringField('Email Address', validators=[DataRequired(), Email()])
@@ -19,5 +20,6 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_email(form, field):
-        if field.data.lower() in app.config.get('REGISTERED_USERS'):
+        same_email_user = User.query.filter_by(email = field.data).first()
+        if same_email_user:
             return ValidationError('Email is Already in Use')
