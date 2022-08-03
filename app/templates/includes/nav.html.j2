@@ -6,12 +6,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <a class="nav-link" href="{{url_for('index')}}">Home</a>
-            <a class="nav-link" href="{{url_for('ergast')}}">Ergast</a>
-            <a class="nav-link" href="{{url_for('students')}}">Students</a>
+            <a class="nav-link" href="{{url_for('social.index')}}">Home</a>
+            <a class="nav-link" href="{{url_for('main.ergast')}}">Ergast</a>
+            <a class="nav-link" href="{{url_for('main.students')}}">Students</a>
             {% if current_user.is_anonymous %}
-                <a class="nav-link" href="{{url_for('login')}}">Login</a>
-                <a class="nav-link" href="{{url_for('register')}}">Register</a>
+                <a class="nav-link" href="{{url_for('auth.login')}}">Login</a>
+                <a class="nav-link" href="{{url_for('auth.register')}}">Register</a>
             {% endif %}
         </div>
 
@@ -23,12 +23,12 @@
             <li class="nav-item">
                 <div class="row">
                      <div class="col-12">
-                        <a href="{{url_for('edit_profile')}}">
+                        <a href="{{url_for('auth.edit_profile')}}">
                             <i class="bi bi-gear-fill"></i>
                         </a>
                       </div>
                       <div class="col-12">
-                         <a href="{{url_for('logout')}}">
+                         <a href="{{url_for('auth.logout')}}">
                              <i class="bi bi-box-arrow-right"></i>
                          </a>
                       </div>

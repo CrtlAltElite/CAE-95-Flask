@@ -15,7 +15,7 @@
             Register
         {% endif %}
     </h1>
-    <form action="{{url_for('edit_profile') if current_user.is_authenticated else url_for('register')}}" method="POST">
+    <form action="{{url_for('auth.edit_profile') if current_user.is_authenticated else url_for('auth.register')}}" method="POST">
     {{form.hidden_tag()}}
 
     <div class="mb-3">
