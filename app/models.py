@@ -83,7 +83,7 @@ class User(UserMixin, db.Model):
     # Get all the posts for user I am following and my own posts
     def followed_posts(self):
         # get all the posts for the users I am following
-        followed = Post.query.join(followers, (Post.user_id == followers.c.followed_id)).filter(followers.c.follwer_id == self.id)
+        followed = Post.query.join(followers, (Post.user_id == followers.c.followed_id)).filter(followers.c.follower_id == self.id)
         # Get all my own posts
         self_posts = Post.query.filter_by(user_id = self.id)
         # Smooosh together and sort them by date

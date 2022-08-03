@@ -5,7 +5,22 @@
 {% endblock %}
 
 {% block content %}
-    <h1>CAE-95 is a good looking group!</h1>
-    <h5>They are about to crush Flask week</h5>
-    They are the greatest! ... for now...
+    <form method="POST" action="{{url_for('social.index')}}">
+        <div class="mb-3">
+            <textarea 
+                class="form-control" 
+                placeholder="What is on your mind?"
+                name= "body"
+                style="height: 100px;"></textarea>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill"></i> &nbsp;Post</button>
+        </div>
+    </form>
+
+
+    <h1>News Feed</h1>
+    <hr>
+    {% for post in posts %}
+        {% include './includes/_post.html.j2' %}
+    {% endfor %}
+
 {% endblock %}
