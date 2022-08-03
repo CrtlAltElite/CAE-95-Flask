@@ -3,7 +3,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-
+from flask_moment import Moment
 
 ## Registering plugin/exts
 
@@ -14,6 +14,8 @@ migrate = Migrate()
 # Login
 login = LoginManager()
 
+moment= Moment()
+
 
 def create_app(config_class=Config):
     # initializing
@@ -23,6 +25,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+    moment.init_app(app)
 
     # Configure some Settings
     login.login_view = 'auth.login'

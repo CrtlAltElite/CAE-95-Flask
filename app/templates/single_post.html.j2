@@ -1,0 +1,7 @@
+{% extends 'base.html.j2' %}
+{% block title %}
+    {{post.author.first_name}}' Post
+{% endblock %}
+{% block content %}
+    {% include 'includes/_post.html.j2' %}
+{% endblock %}
