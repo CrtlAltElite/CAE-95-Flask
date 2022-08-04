@@ -1,8 +1,9 @@
+from asyncio import create_task
 from app import db, login
 from flask_login import UserMixin # THIS IS ONLY FOR THE USER MODEL!!!!!!!!!!!!
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import secrets
 
 followers = db.Table(
     'followers',
@@ -20,6 +21,9 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String)
     created_on = db.Column(db.DateTime, default=dt.utcnow)
     icon = db.Column(db.Integer)
+    token = db.Column(db.String, unique=True, index=True)   
+    token_exp = db.Column(db.DateTime)
+    is_admin = db.Column(db.Boolean, default=False)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     followed = db.relationship('User',
         secondary=followers,
@@ -27,8 +31,37 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'),
         lazy='dynamic'
-        )   
+        )
+
+    ##################################################
+    ############## Methods for Token auth ############
+    ##################################################    
+    def get_token(self, exp=86400):
+        current_time = dt.utcnow()
+        # if the token is valid return the token
+        if self.token and self.token_exp > current_time + timedelta(seconds=60):
+            return self.token
+        # There was no token/ it was expired so we make a new one
+        self.token=secrets.token_urlsafe(32)
+        self.token_exp = current_time + timedelta(seconds=exp)
+        self.save()
+        return self.token
+
+    def revoke_token(self):
+        self.token_exp = dt.utcnow() - timedelta(seconds=60)
     
+    @staticmethod
+    def check_token(token):
+        u = User.query.filter_by(token=token).first()
+        if not u or u.token_exp < dt.utcnow():
+            return None
+        return u
+
+
+    #########################################
+    ############# End Methods for tokens ####
+    #########################################
+
     # should return a unique identifing string
     def __repr__(self):
         return f'<User: {self.email} | {self.id}>'
@@ -60,6 +93,19 @@ class User(UserMixin, db.Model):
         self.email=data['email']
         self.password=self.hash_password(data['password'])
         self.icon=data['icon']
+    
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'first_name':self.first_name,
+            'last_name':self.last_name,
+            'email':self.email,
+            'created_on':self.created_on,
+            'icon':self.icon,
+            'token':self.token,
+            'is_admin':self.is_admin
+        }
 
     def get_icon_url(self):
         return f"http://avatars.dicebear.com/api/croodles/{self.icon}.svg"
