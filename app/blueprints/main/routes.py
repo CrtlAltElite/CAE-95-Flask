@@ -1,12 +1,13 @@
-from flask import render_template, request
+from flask import render_template, request, make_response
 import requests
 from flask_login import login_required
 from . import bp as main
 
 
+
 @main.route('/api_test', methods=['GET'])
 def api_test():
-    return {"Dylan S":"Smelly", "Dylan K":"Smart", "Sarah":"Worlds Best Mom", "Gio":"handfull"}
+    return make_response({"Dylan S":"Smelly", "Dylan K":"Smart", "Sarah":"Worlds Best Mom", "Gio":"handfull"}, 200)
 
 
 @main.route('/students', methods=['GET'])

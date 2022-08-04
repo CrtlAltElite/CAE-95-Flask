@@ -119,4 +119,13 @@ class Post(db.Model):
     def delete(self):
         db.session.delete(self) # remove the user from the session
         db.session.commit() # save the stuff in the session to the database
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'body':self.body,
+            'date_created':self.date_created,
+            'date_updated':self.date_updated,
+            'user_id':self.user_id
+            }
     

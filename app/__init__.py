@@ -41,6 +41,9 @@ def create_app(config_class=Config):
     from .blueprints.social import bp as social_bp
     app.register_blueprint(social_bp)
     
+    from .blueprints.api import bp as api_bp
+    app.register_blueprint(api_bp)
+
     return app
 
 
