@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from app.models import User, Post
 
 # Routes
-@social.route('/', methods=['GET', 'POST'])
+@social.route('/home', methods=['GET', 'POST'])
 @login_required
 def index():
     if request.method == 'POST':
