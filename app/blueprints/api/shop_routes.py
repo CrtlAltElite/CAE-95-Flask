@@ -1,8 +1,58 @@
+from collections import Counter
 from . import bp as api
 from app.blueprints.auth.auth import token_auth
 from flask import request, make_response, g, abort, jsonify
 from .models import *
 from helpers import require_admin
+import stripe
+import os
+
+############
+##
+##  Stripe API ROUTES
+##
+############
+
+stripe.api_key = os.environ.get('STRIPE_SK')
+YOUR_DOMAIN = os.environ.get('YOUR_DOMAIN')
+
+@api.route('/create-checkout-session', methods=['POST'])
+@token_auth.login_required()
+def create_checkout_session():
+    data = request.get_json()
+    cart = data.get('cart')
+    user = data.get('user')
+    line_items=[]
+    filtered_ids = map(lambda item: item['id'] ,cart)
+    item_counts = Counter(filtered_ids)
+    for item in cart:
+        if item['id'] in item_counts:
+            line_items.append({
+                "name":item['name'],
+                'amount':int(float(item['price'])*100),
+                'quantity':item_counts[item['id']],
+                'currency':'USD'
+            })
+            del item_counts[item['id']]
+
+    # try:
+    checkout_session = stripe.checkout.Session.create(
+        customer_email = user['email'],
+        billing_address_collection='auto',
+        shipping_address_collection={
+            "allowed_countries":['US','CA']
+        },
+        line_items=line_items,
+        mode="payment",
+        success_url=YOUR_DOMAIN + 'checkoutsuccess',
+        cancel_url=YOUR_DOMAIN + 'cart/true',
+    )
+
+    # except Exception as e:
+    #     return str(e)
+    
+    return make_response({"url":checkout_session.url}, 200)
+
 
 ############
 ##
@@ -26,6 +76,7 @@ def get_category():
 @require_admin
 def post_category():
     cat_name = request.get_json().get("name")
+    print(request.get_json())
     if not cat_name:
         abort(406)
     cat = Category(name = cat_name)
@@ -49,9 +100,9 @@ def put_category(id):
     return make_response(f"success {cat.id} updated", 200)
 
 # Delete a category
-# {
+# 
 #     "id": "id of my category to delete"
-# }
+# 
 @api.delete('/category/<int:id>')
 @token_auth.login_required()
 @require_admin
